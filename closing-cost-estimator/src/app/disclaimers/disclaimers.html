@@ -1,0 +1,238 @@
+<div class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+
+  <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 px-5 py-4 rounded-r-lg">
+    <p class="font-semibold text-base mb-1">Disclaimers &amp; Known Limitations</p>
+    <p class="text-sm">Read these before relying on any figures from this calculator. Every section below documents a specific area where the estimates may diverge from your actual closing statement.</p>
+  </div>
+
+  <!-- General Disclaimer -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">General Disclaimer</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed">
+      <p>This calculator is an estimate only. It is not a commitment, quote, or guarantee of actual closing costs. Actual charges at settlement may differ. Consult your lender, title company, and/or real estate attorney for binding figures.</p>
+    </div>
+  </section>
+
+  <!-- Closing Date Range Limitation -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Closing Date Range Limitation</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
+      <p>The escrow reserve and tax adjustment month lookups are hardcoded for closing dates between <strong>December 2024 and December 2025 only</strong>. These values were extracted directly from the source spreadsheet's lookup tables, which only covered that 13-month window.</p>
+      <p>If you enter a closing date outside this range, the calculator will show a warning and the escrow/adjustment figures may be inaccurate or unavailable. The underlying pattern is cyclical (school taxes repeat on a Jul–Jun fiscal year, county/muni taxes on a Jan–Dec calendar year), so the values could be generalized — but the current implementation does not do this, to avoid introducing errors.</p>
+    </div>
+  </section>
+
+  <!-- Title Insurance -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Title Insurance Rate Table</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
+      <p>The title insurance premium is calculated from a tiered piecewise formula reverse-engineered from the spreadsheet's 2,000-row lookup table. The tiers and per-thousand rates were verified against the raw data, but the table itself is specific to one title insurance underwriter's rate schedule. Your actual title insurance premium may differ based on your title company, any simultaneous-issue discounts, or rate changes after 2025.</p>
+      <p>The spreadsheet also contains a simplified fallback formula for prices over $500K: <code class="bg-gray-100 px-1 rounded font-mono">((price - 500000) / 1000) × $4 + $2,904</code>. This formula produces slightly different results than the actual lookup table (which uses $4.56/1K for $501K–$1M and $3.42/1K for $1M–$2M). This calculator uses the more accurate tiered rates from the table, not the simplified formula.</p>
+      <p>For purchase prices above $2,000,000, the calculator extrapolates at the $3.42/1K rate. The source spreadsheet had no data above $2M, so this is an assumption.</p>
+    </div>
+  </section>
+
+  <!-- PMI -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">PMI / Mortgage Insurance (Conventional Loans)</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
+      <p>The source spreadsheet's PMI chart (Sheet2 columns D:E) maps LTV ranges to a uniform 0.94% annual rate for all LTV values from 80.01% to 97%. In reality, PMI rates vary significantly by LTV band, credit score, and insurer.</p>
+      <p>However, the spreadsheet's actual mortgage insurance formula doesn't use that chart at all — it uses a hardcoded value of <strong>0.52%</strong> (stored in cell L74). This calculator uses the 0.52% value to match the spreadsheet's behavior. Neither value is likely to match your actual PMI quote. Treat the mortgage insurance line as a rough placeholder and get a real quote from your lender.</p>
+    </div>
+  </section>
+
+  <!-- FHA and VA -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">FHA and VA Rates</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
+      <p><strong>FHA UFMIP (Upfront Mortgage Insurance Premium):</strong> hardcoded at 1.75% of the base loan amount. This is the standard rate as of 2025 but can change by FHA policy.</p>
+      <p><strong>FHA Annual MIP:</strong> hardcoded at 0.85% of the final loan amount (loan + UFMIP). In practice, FHA MIP rates vary by loan term, LTV, and loan amount. For loans ≤ $726,200 with LTV &gt; 95% and term &gt; 15 years, 0.85% is correct as of 2025 — but other scenarios use different rates.</p>
+      <p><strong>VA Funding Fee:</strong> hardcoded at 2.15% of the base loan amount. The actual VA funding fee depends on service category (Regular Military, Reserves/Guard), down payment percentage, and whether it's a first or subsequent use. 2.15% corresponds to first-use, 0% down, Regular Military. Exemptions exist for veterans with service-connected disabilities.</p>
+    </div>
+  </section>
+
+  <!-- Hazard Insurance -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Hazard Insurance</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed">
+      <p>The hazard insurance estimate uses a simple formula: <strong>$6 per $1,000 of purchase price</strong>, with a $550 minimum for properties under $100K. This is a rough industry average for Pennsylvania. Your actual homeowner's insurance premium depends on the property's location, age, construction, coverage limits, deductible, and insurer. It could easily be 30–50% higher or lower than this estimate.</p>
+    </div>
+  </section>
+
+  <!-- Flood Insurance -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Flood Insurance</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
+      <p><strong>Mandatory:</strong> estimated at 1.75% of the loan amount. Under FEMA's Risk Rating 2.0, actual flood insurance premiums are property-specific and can vary dramatically. This is a rough estimate only.</p>
+      <p><strong>Optional:</strong> flat $450. This is an arbitrary placeholder from the spreadsheet — actual optional flood policies vary widely.</p>
+    </div>
+  </section>
+
+  <!-- Tax Proration -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Tax Proration</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
+      <p>The tax proration calculations assume:</p>
+      <ul class="list-disc list-inside space-y-1 ml-2">
+        <li>School taxes operate on a July 1 – June 30 fiscal year (standard for Pennsylvania school districts)</li>
+        <li>County/Municipal taxes operate on a January 1 – December 31 calendar year</li>
+        <li>Prorations use a 365-day year (actual days), not a 360-day banker's year</li>
+        <li>Per-diem = annual tax ÷ 365, regardless of leap year</li>
+      </ul>
+      <p>The spreadsheet's proration engine includes a days-in-year table that accounts for leap years (366 days for 2000, 2004, 2008, etc.) but uses 365 for most years including some that should be 366 (e.g., 2024 is listed as 365 but was actually 366). This calculator follows the spreadsheet's values for consistency, but the proration could be off by a small amount in leap years.</p>
+      <p>The proration also assumes the seller has already paid the current period's full tax bill. If taxes are unpaid or partially paid, the actual settlement adjustment will differ.</p>
+    </div>
+  </section>
+
+  <!-- Escrow Reserves -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Escrow Reserves</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
+      <p>The number of months collected into escrow at closing is determined by a lookup table specific to the lender's escrow analysis. Different lenders may require different reserve cushions. The values in this calculator come from one specific spreadsheet and may not match your lender's requirements.</p>
+      <p>RESPA limits the escrow cushion to 2 months, but the spreadsheet's escrow month counts sometimes exceed this (e.g., 13 months for school tax escrow in July closings). This likely reflects the initial escrow deposit needed to have funds available when the next tax bill is due, not an ongoing cushion violation.</p>
+    </div>
+  </section>
+
+  <!-- Per-Diem Interest -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Per-Diem Interest</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed">
+      <p>Interest is calculated using a <strong>360-day year</strong> (banker's convention): per-diem = (loan × rate) / 360. Some lenders use a 365-day year. The number of days of prepaid interest depends on the exact closing date within the month and the first payment date, which is always the 1st of the month approximately 2 months after closing.</p>
+    </div>
+  </section>
+
+  <!-- Flat Fees -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Flat Fees</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700">
+      <p class="mb-3 leading-relaxed">The following fees are hardcoded from the 2025 spreadsheet and may change over time or vary by provider:</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200">
+              <th class="text-left px-3 py-2 font-semibold text-gray-700">Fee</th>
+              <th class="text-right px-3 py-2 font-semibold text-gray-700 font-mono">Amount</th>
+              <th class="text-left px-3 py-2 font-semibold text-gray-700">Notes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Appraisal</td>
+              <td class="px-3 py-2 text-right font-mono">$460</td>
+              <td class="px-3 py-2 text-gray-500">Varies by property type and appraiser</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Credit Report</td>
+              <td class="px-3 py-2 text-right font-mono">$35</td>
+              <td class="px-3 py-2 text-gray-500">May be higher for joint applications</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Tax Service Fee</td>
+              <td class="px-3 py-2 text-right font-mono">$100</td>
+              <td class="px-3 py-2 text-gray-500">Lender-specific</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Administration Fee</td>
+              <td class="px-3 py-2 text-right font-mono">$639</td>
+              <td class="px-3 py-2 text-gray-500">Lender-specific — can vary significantly</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Flood Certification</td>
+              <td class="px-3 py-2 text-right font-mono">$19</td>
+              <td class="px-3 py-2 text-gray-500">Usually standard</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Closing/Escrow Fee</td>
+              <td class="px-3 py-2 text-right font-mono">$25</td>
+              <td class="px-3 py-2 text-gray-500">Title company specific</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Document Preparation</td>
+              <td class="px-3 py-2 text-right font-mono">$100</td>
+              <td class="px-3 py-2 text-gray-500">Title company specific</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Notary Fee</td>
+              <td class="px-3 py-2 text-right font-mono">$20</td>
+              <td class="px-3 py-2 text-gray-500">May be higher in some counties</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">ALTA Endorsements</td>
+              <td class="px-3 py-2 text-right font-mono">$200</td>
+              <td class="px-3 py-2 text-gray-500">Lender-required, varies by endorsements needed</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">CPL Letter</td>
+              <td class="px-3 py-2 text-right font-mono">$125</td>
+              <td class="px-3 py-2 text-gray-500">Title company specific</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">Recording Fees</td>
+              <td class="px-3 py-2 text-right font-mono">$140</td>
+              <td class="px-3 py-2 text-gray-500">County-specific, depends on number of pages</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-2">PIN Certification</td>
+              <td class="px-3 py-2 text-right font-mono">$30/$15</td>
+              <td class="px-3 py-2 text-gray-500">County-specific</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transfer Tax -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Transfer Tax</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed">
+      <p>Default is <strong>1% of purchase price</strong> (Pennsylvania state transfer tax is 1%, split equally between buyer and seller in most counties — but some municipalities add local transfer tax). The actual rate depends on your municipality. The calculator allows you to change this percentage.</p>
+    </div>
+  </section>
+
+  <!-- What's NOT Included -->
+  <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-gray-100 px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">What's NOT Included</h2>
+    </div>
+    <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed">
+      <p class="mb-3">This calculator does not account for:</p>
+      <ul class="list-disc list-inside space-y-1.5 ml-2">
+        <li>Lender-specific fees not in the spreadsheet (underwriting fees, warehouse fees, rate lock fees, etc.)</li>
+        <li>Survey costs</li>
+        <li>Home warranty</li>
+        <li>Prepaid HOA assessments or move-in fees</li>
+        <li>Attorney fees beyond the optional line item</li>
+        <li>Any credits from the lender (lender credits for above-par pricing)</li>
+        <li>Simultaneous-issue title insurance discounts (if the seller is also purchasing an owner's policy)</li>
+        <li>Construction or renovation escrows</li>
+        <li>Any post-2025 changes to PA transfer tax rates, FHA/VA fee schedules, or title insurance rate filings</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
