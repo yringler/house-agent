@@ -1,0 +1,601 @@
+<div class="min-h-screen bg-gray-50 text-gray-800">
+  <!-- Header -->
+  <header class="bg-blue-800 text-white py-4 px-6 shadow-md">
+    <h1 class="text-2xl font-bold tracking-tight">PA Buyer's Closing Cost Estimator</h1>
+    <p class="text-blue-200 text-sm mt-1">Good Faith Estimate of Settlement Charges</p>
+  </header>
+
+  @if (r.outOfChartRange && form.closingDate) {
+  <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 px-6 py-3 text-sm">
+    &#9888; Closing date is outside the Dec 2024–Dec 2025 chart range. Escrow/adjustment calculations may be inaccurate.
+  </div>
+  }
+
+  <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 xl:grid-cols-[2fr_3fr] gap-6">
+
+    <!-- ===== INPUT FORM ===== -->
+    <div class="space-y-4">
+
+      <!-- Deal Info -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-blue-700 mb-3">Deal Info</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="col-span-2">
+            <label class="block text-xs text-gray-500 mb-1">Closing Date</label>
+            <input type="date" [(ngModel)]="form.closingDate"
+              class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Purchase Price</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.purchasePrice" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Total Loan Amount</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.totalLoanAmount" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Deposit</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.deposit" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Seller's Assist</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.sellersAssist" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Interest Rate (%)</label>
+            <input type="number" [(ngModel)]="form.interestRate" min="0" step="0.125"
+              class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Loan Term (months)</label>
+            <input type="number" [(ngModel)]="form.loanTermMonths" min="1"
+              class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Mortgage Type -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-blue-700 mb-3">Mortgage Type</h2>
+        <div class="flex gap-3 flex-wrap">
+          @for (opt of [['conventional','Conventional'],['fha','FHA'],['va','VA'],['cash','Cash']]; track opt[0]) {
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="radio" name="mortgageType" [value]="opt[0]" [(ngModel)]="form.mortgageType"
+              class="accent-blue-600" />
+            <span class="text-sm">{{opt[1]}}</span>
+          </label>
+          }
+        </div>
+      </section>
+
+      <!-- Tax Info -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-blue-700 mb-3">Tax Info</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">School Taxes (annual)</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.schoolTaxesAnnual" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">County/Muni Taxes (annual)</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.countyMuniTaxesAnnual" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+          <div class="col-span-2 flex items-center gap-3">
+            <label class="text-xs text-gray-500">Escrowing</label>
+            <div class="flex rounded overflow-hidden border border-gray-300">
+              <button (click)="form.escrowing=true" [class]="form.escrowing ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'"
+                class="px-3 py-1 text-sm font-medium transition-colors">Yes</button>
+              <button (click)="form.escrowing=false" [class]="!form.escrowing ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'"
+                class="px-3 py-1 text-sm font-medium transition-colors">No</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fees -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-blue-700 mb-3">Fees</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Origination/Discount Fee (%)</label>
+            <input type="number" [(ngModel)]="form.originationFeePercent" min="0" step="0.125"
+              class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Transfer Tax Rate (%)</label>
+            <input type="number" [(ngModel)]="form.transferTaxRate" min="0" step="0.1"
+              class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Attorney Fee</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.attorneyFee" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Broker Fee</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.brokerFee" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">HOA Fee (monthly)</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.hoaFeeMonthly" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inspections -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-blue-700 mb-3">Inspections</h2>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" [(ngModel)]="form.inspStructural" class="accent-blue-600" />
+            Structural ($300)
+          </label>
+          <label class="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" [(ngModel)]="form.inspRadon" class="accent-blue-600" />
+            Radon ($150)
+          </label>
+          <label class="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" [(ngModel)]="form.inspPest" class="accent-blue-600" />
+            Pest ($100)
+          </label>
+          <label class="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" [(ngModel)]="form.inspSeptic" class="accent-blue-600" />
+            Septic ($400)
+          </label>
+          <label class="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" [(ngModel)]="form.inspWell" class="accent-blue-600" />
+            Well ($100)
+          </label>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Other</label>
+            <div class="relative"><span class="absolute left-2 top-1.5 text-gray-400 text-sm">$</span>
+            <input type="number" [(ngModel)]="form.inspOther" min="0"
+              class="w-full border border-gray-300 rounded pl-5 pr-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flood Insurance -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-blue-700 mb-3">Flood Insurance</h2>
+        <div class="flex flex-col gap-2">
+          @for (opt of [['none','None'],['mandatory','Mandatory (1.75% of loan)'],['optional','Optional ($450 flat)']]; track opt[0]) {
+          <label class="flex items-center gap-1.5 cursor-pointer text-sm">
+            <input type="radio" name="floodCat" [value]="opt[0]" [(ngModel)]="form.floodCategory" class="accent-blue-600" />
+            {{opt[1]}}
+          </label>
+          }
+        </div>
+      </section>
+
+      <!-- Land Only -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium">
+          <input type="checkbox" [(ngModel)]="form.landOnly" class="accent-blue-600 w-4 h-4" />
+          Land Only (skip hazard insurance)
+        </label>
+      </section>
+
+    </div>
+
+    <!-- ===== RESULTS PANEL ===== -->
+    <div class="space-y-4">
+
+      <!-- First Payment Date callout -->
+      @if (r.firstPaymentDate) {
+      <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 flex items-center justify-between">
+        <span class="text-sm text-blue-700 font-medium">First Payment Date</span>
+        <span class="text-blue-900 font-bold">{{fmtDate(r.firstPaymentDate)}}</span>
+      </div>
+      }
+
+      <!-- Section 800 -->
+      @if (r.hasLoan) {
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-100 px-4 py-2 flex justify-between items-center">
+          <h2 class="font-semibold text-sm text-gray-700">800 — Items Payable in Connection with Loan</h2>
+          <span class="font-bold text-sm">{{fmt(r.section800Total)}}</span>
+        </div>
+        <table class="w-full text-sm">
+          <tbody>
+            <tr [class]="r.originationFee===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400 w-12">801</td>
+              <td class="px-2 py-1">Origination/Discount Fee ({{form.originationFeePercent}}%)</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.originationFee)}}</td>
+            </tr>
+            <tr [class]="r.appraisalFee===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">802</td>
+              <td class="px-2 py-1">Appraisal Fee</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.appraisalFee)}}</td>
+            </tr>
+            <tr [class]="r.creditReport===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">803</td>
+              <td class="px-2 py-1">Credit Report</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.creditReport)}}</td>
+            </tr>
+            <tr [class]="r.taxService===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">804</td>
+              <td class="px-2 py-1">Tax Related Service Fee</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.taxService)}}</td>
+            </tr>
+            <tr [class]="r.administrationFee===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">808</td>
+              <td class="px-2 py-1">Administration Fee</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.administrationFee)}}</td>
+            </tr>
+            <tr [class]="r.floodCert===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">809</td>
+              <td class="px-2 py-1">Flood Certification</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.floodCert)}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      }
+
+      <!-- Section 1100 -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-100 px-4 py-2 flex justify-between items-center">
+          <h2 class="font-semibold text-sm text-gray-700">1100 — Title Charges</h2>
+          <span class="font-bold text-sm">{{fmt(r.section1100Total)}}</span>
+        </div>
+        <table class="w-full text-sm">
+          <tbody>
+            <tr [class]="r.closingEscrowFee===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400 w-12">1101</td>
+              <td class="px-2 py-1">Closing/Escrow Fee</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.closingEscrowFee)}}</td>
+            </tr>
+            <tr [class]="r.docPrepFee===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1102</td>
+              <td class="px-2 py-1">Document Prep Fee</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.docPrepFee)}}</td>
+            </tr>
+            <tr [class]="r.notaryFee===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1103</td>
+              <td class="px-2 py-1">Notary Fee</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.notaryFee)}}</td>
+            </tr>
+            <tr [class]="r.attorneyFee===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1107</td>
+              <td class="px-2 py-1">Attorney Fee</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.attorneyFee)}}</td>
+            </tr>
+            <tr [class]="r.titleInsurance===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1108</td>
+              <td class="px-2 py-1">Title Insurance</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.titleInsurance)}}</td>
+            </tr>
+            <tr [class]="r.altaEndorsements===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1112</td>
+              <td class="px-2 py-1">ALTA Endorsements</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.altaEndorsements)}}</td>
+            </tr>
+            <tr [class]="r.cplLetter===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1113</td>
+              <td class="px-2 py-1">CPL Letter</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.cplLetter)}}</td>
+            </tr>
+            @if (r.brokerFee > 0) {
+            <tr>
+              <td class="px-4 py-1 text-gray-400">1199</td>
+              <td class="px-2 py-1">Broker Fee</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.brokerFee)}}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 1200 -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-100 px-4 py-2 flex justify-between items-center">
+          <h2 class="font-semibold text-sm text-gray-700">1200 — Government Recording &amp; Transfer</h2>
+          <span class="font-bold text-sm">{{fmt(r.section1200Total)}}</span>
+        </div>
+        <table class="w-full text-sm">
+          <tbody>
+            <tr [class]="r.recordingFees===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400 w-12">1201</td>
+              <td class="px-2 py-1">Recording Fees</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.recordingFees)}}</td>
+            </tr>
+            <tr [class]="r.transferTax===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1203</td>
+              <td class="px-2 py-1">Transfer Tax ({{form.transferTaxRate}}%)</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.transferTax)}}</td>
+            </tr>
+            <tr [class]="r.pinCert===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1205</td>
+              <td class="px-2 py-1">PIN Certification</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.pinCert)}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 1300 -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-100 px-4 py-2 flex justify-between items-center">
+          <h2 class="font-semibold text-sm text-gray-700">1300 — Inspections</h2>
+          <span class="font-bold text-sm">{{fmt(r.section1300Total)}}</span>
+        </div>
+        <table class="w-full text-sm">
+          <tbody>
+            <tr [class]="r.inspStructural===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400 w-12">1301</td>
+              <td class="px-2 py-1">Structural Inspection</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.inspStructural)}}</td>
+            </tr>
+            <tr [class]="r.inspRadon===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1302</td>
+              <td class="px-2 py-1">Radon Inspection</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.inspRadon)}}</td>
+            </tr>
+            <tr [class]="r.inspPest===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1303</td>
+              <td class="px-2 py-1">Pest Inspection</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.inspPest)}}</td>
+            </tr>
+            <tr [class]="r.inspSeptic===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1304</td>
+              <td class="px-2 py-1">Septic Inspection</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.inspSeptic)}}</td>
+            </tr>
+            <tr [class]="r.inspWell===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1305</td>
+              <td class="px-2 py-1">Well Inspection</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.inspWell)}}</td>
+            </tr>
+            @if (r.inspOther > 0) {
+            <tr>
+              <td class="px-4 py-1 text-gray-400">1399</td>
+              <td class="px-2 py-1">Other Inspection</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.inspOther)}}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Closing Costs Total -->
+      <div class="bg-blue-700 text-white rounded-lg px-4 py-3 flex justify-between items-center">
+        <span class="font-semibold">Estimated Closing Costs</span>
+        <span class="font-bold text-lg font-mono">{{fmt(r.estimatedClosingCosts)}}</span>
+      </div>
+
+      <!-- Section 900 -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-100 px-4 py-2 flex justify-between items-center">
+          <h2 class="font-semibold text-sm text-gray-700">900 — Prepaid Items</h2>
+          <span class="font-bold text-sm">{{fmt(r.perDiemTotal + r.hazardInsurance + r.floodInsurance)}}</span>
+        </div>
+        <table class="w-full text-sm">
+          <tbody>
+            @if (r.hasLoan) {
+            <tr [class]="r.perDiemTotal===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400 w-12">901</td>
+              <td class="px-2 py-1">
+                Per-Diem Interest
+                @if (r.perDiemDays > 0) {
+                <span class="text-gray-400">({{r.perDiemDays}} days &times; {{fmt(r.perDiemRate)}})</span>
+                }
+              </td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.perDiemTotal)}}</td>
+            </tr>
+            }
+            <tr [class]="r.hazardInsurance===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">903</td>
+              <td class="px-2 py-1">Hazard Insurance (1 year)</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.hazardInsurance)}}</td>
+            </tr>
+            <tr [class]="r.floodInsurance===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">904</td>
+              <td class="px-2 py-1">Flood Insurance (1 year)</td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.floodInsurance)}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 1000 -->
+      @if (form.escrowing) {
+      <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gray-100 px-4 py-2 flex justify-between items-center">
+          <h2 class="font-semibold text-sm text-gray-700">1000 — Escrow Reserves &amp; Tax Adjustments</h2>
+          <span class="font-bold text-sm">{{fmt(r.hazardInsReserve + r.schoolTaxReserve + r.cmTaxReserve + r.schoolTaxAdjust + r.cmTaxAdjust)}}</span>
+        </div>
+        <table class="w-full text-sm">
+          <tbody>
+            <tr [class]="r.hazardInsReserve===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400 w-12">1001</td>
+              <td class="px-2 py-1">Hazard Ins Reserve <span class="text-gray-400">({{r.hazardInsReserveMonths}} mo &times; {{fmt(r.hazardInsurance/12)}})</span></td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.hazardInsReserve)}}</td>
+            </tr>
+            <tr [class]="r.schoolTaxReserve===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1004</td>
+              <td class="px-2 py-1">School Tax Reserve <span class="text-gray-400">({{r.schoolTaxReserveMonths}} mo &times; {{fmt(form.schoolTaxesAnnual/12)}})</span></td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.schoolTaxReserve)}}</td>
+            </tr>
+            <tr [class]="r.cmTaxReserve===0?'text-gray-400':''">
+              <td class="px-4 py-1 text-gray-400">1005</td>
+              <td class="px-2 py-1">County/Muni Tax Reserve <span class="text-gray-400">({{r.cmTaxReserveMonths}} mo &times; {{fmt(form.countyMuniTaxesAnnual/12)}})</span></td>
+              <td class="px-4 py-1 text-right font-mono">{{fmt(r.cmTaxReserve)}}</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-1 text-gray-400">1006</td>
+              <td class="px-2 py-1">
+                School Tax Adjustment
+                <span class="text-gray-400">({{r.schoolTaxAdjustMonths}} mo &times; {{fmt(form.schoolTaxesAnnual/12)}})</span>
+                @if (r.schoolTaxAdjustMonths < 0) {<span class="text-green-600 text-xs ml-1">seller credit</span>}
+              </td>
+              <td class="px-4 py-1 text-right font-mono" [class.text-green-600]="r.schoolTaxAdjust < 0">{{fmt(r.schoolTaxAdjust)}}</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-1 text-gray-400">1007</td>
+              <td class="px-2 py-1">
+                County/Muni Tax Adjustment
+                <span class="text-gray-400">({{r.cmTaxAdjustMonths}} mo &times; {{fmt(form.countyMuniTaxesAnnual/12)}})</span>
+                @if (r.cmTaxAdjustMonths < 0) {<span class="text-green-600 text-xs ml-1">seller credit</span>}
+              </td>
+              <td class="px-4 py-1 text-right font-mono" [class.text-green-600]="r.cmTaxAdjust < 0">{{fmt(r.cmTaxAdjust)}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      }
+
+      <!-- Prepaid Total -->
+      <div class="bg-blue-700 text-white rounded-lg px-4 py-3 flex justify-between items-center">
+        <span class="font-semibold">Estimated Prepaid Items</span>
+        <span class="font-bold text-lg font-mono">{{fmt(r.estimatedPrepaidItems)}}</span>
+      </div>
+
+      <!-- Total Settlement -->
+      <div class="bg-blue-900 text-white rounded-lg px-4 py-3 flex justify-between items-center">
+        <span class="font-semibold">Total Estimated Settlement Charges</span>
+        <span class="font-bold text-xl font-mono">{{fmt(r.totalSettlementCharges)}}</span>
+      </div>
+
+      <!-- Funds to Close & Monthly Payment side by side -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <!-- Funds to Close -->
+        <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="bg-green-700 text-white px-4 py-2">
+            <h2 class="font-semibold text-sm">Funds to Close</h2>
+          </div>
+          <table class="w-full text-sm">
+            <tbody>
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">Purchase Price</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(form.purchasePrice)}}</td>
+              </tr>
+              @if (r.ufmipFundingFee > 0) {
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">
+                  @if (form.mortgageType === 'fha') { UFMIP (1.75%) }
+                  @if (form.mortgageType === 'va') { VA Funding Fee (2.15%) }
+                </td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(r.ufmipFundingFee)}}</td>
+              </tr>
+              }
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">Est. Closing Costs</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(r.estimatedClosingCosts)}}</td>
+              </tr>
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">Est. Prepaid Items</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(r.estimatedPrepaidItems)}}</td>
+              </tr>
+              @if (form.hoaFeeMonthly > 0) {
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">HOA Fee</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(form.hoaFeeMonthly)}}</td>
+              </tr>
+              }
+              @if (r.hasLoan) {
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">Final Loan Amount</td>
+                <td class="px-4 py-1.5 text-right font-mono text-red-600">&#8722;{{fmt(r.finalLoanAmount)}}</td>
+              </tr>
+              }
+              <tr class="border-b border-gray-200 bg-gray-50">
+                <td class="px-4 py-1.5 font-medium">Down Pmt &amp; Closing Costs</td>
+                <td class="px-4 py-1.5 text-right font-mono font-medium">{{fmt(r.downPaymentAndCosts)}}</td>
+              </tr>
+              @if (form.sellersAssist > 0) {
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">Seller's Assist</td>
+                <td class="px-4 py-1.5 text-right font-mono text-green-600">&#8722;{{fmt(form.sellersAssist)}}</td>
+              </tr>
+              }
+              @if (form.deposit > 0) {
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">Deposit</td>
+                <td class="px-4 py-1.5 text-right font-mono text-green-600">&#8722;{{fmt(form.deposit)}}</td>
+              </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="bg-green-700 text-white">
+                <td class="px-4 py-2 font-bold">Total Est. Funds to Close</td>
+                <td class="px-4 py-2 text-right font-mono font-bold text-lg">{{fmt(r.totalFundsToClose)}}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </section>
+
+        <!-- Monthly Payment -->
+        <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="bg-purple-700 text-white px-4 py-2">
+            <h2 class="font-semibold text-sm">Monthly Payment</h2>
+          </div>
+          <table class="w-full text-sm">
+            <tbody>
+              <tr [class]="r.mortgagePayment===0?'text-gray-400 border-b border-gray-100':'border-b border-gray-100'">
+                <td class="px-4 py-1.5 text-gray-600">Mortgage (P&amp;I)</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(r.mortgagePayment)}}</td>
+              </tr>
+              <tr [class]="r.hazardInsMonthly===0?'text-gray-400 border-b border-gray-100':'border-b border-gray-100'">
+                <td class="px-4 py-1.5 text-gray-600">Hazard Insurance</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(r.hazardInsMonthly)}}</td>
+              </tr>
+              @if (form.floodCategory === 'mandatory') {
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">Flood Insurance</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(r.floodInsMonthly)}}</td>
+              </tr>
+              }
+              <tr [class]="r.reTaxesMonthly===0?'text-gray-400 border-b border-gray-100':'border-b border-gray-100'">
+                <td class="px-4 py-1.5 text-gray-600">R/E Taxes</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(r.reTaxesMonthly)}}</td>
+              </tr>
+              @if (r.mortgageInsurance > 0) {
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">
+                  @if (form.mortgageType === 'conventional') { PMI }
+                  @if (form.mortgageType === 'fha') { MIP }
+                  <span class="text-gray-400 text-xs">(LTV {{r.ltv | number:'1.1-1'}}%)</span>
+                </td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(r.mortgageInsurance)}}</td>
+              </tr>
+              }
+              @if (form.hoaFeeMonthly > 0) {
+              <tr class="border-b border-gray-100">
+                <td class="px-4 py-1.5 text-gray-600">HOA</td>
+                <td class="px-4 py-1.5 text-right font-mono">{{fmt(form.hoaFeeMonthly)}}</td>
+              </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="bg-purple-700 text-white">
+                <td class="px-4 py-2 font-bold">Total Est. Monthly</td>
+                <td class="px-4 py-2 text-right font-mono font-bold text-lg">{{fmt(r.totalMonthlyPayment)}}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </section>
+
+      </div>
+
+    </div>
+  </div>
+</div>

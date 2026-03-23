@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx @angular/cli@latest new closing-cost-estimator --standalone --routing=false --style=css --skip-git --skip-install)",
+      "Bash(*)",
+      "Bash(npm install:*)",
+      "Bash(cat vite.config.*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d[''''projects''''], indent=2\\)\\)\")",
+      "Bash(npm uninstall:*)",
+      "Bash(npx tailwindcss:*)"
+    ]
+  }
+}
