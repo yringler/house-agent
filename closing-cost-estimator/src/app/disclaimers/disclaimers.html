@@ -21,7 +21,7 @@
       <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Closing Date Range Limitation</h2>
     </div>
     <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
-      <p>The escrow reserve and tax adjustment month lookups are hardcoded for closing dates between <strong>December 2024 and December 2025 only</strong>. These values were extracted directly from the source spreadsheet's lookup tables, which only covered that 13-month window.</p>
+      <p>The escrow reserve and tax adjustment month lookups are hardcoded for closing dates between <strong>December 2024 and December 2025 only</strong>.</p>
       <p>If you enter a closing date outside this range, the calculator will show a warning and the escrow/adjustment figures may be inaccurate or unavailable. The underlying pattern is cyclical (school taxes repeat on a Jul–Jun fiscal year, county/muni taxes on a Jan–Dec calendar year), so the values could be generalized — but the current implementation does not do this, to avoid introducing errors.</p>
     </div>
   </section>
@@ -32,9 +32,9 @@
       <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Title Insurance Rate Table</h2>
     </div>
     <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
-      <p>The title insurance premium is calculated from a tiered piecewise formula reverse-engineered from the spreadsheet's 2,000-row lookup table. The tiers and per-thousand rates were verified against the raw data, but the table itself is specific to one title insurance underwriter's rate schedule. Your actual title insurance premium may differ based on your title company, any simultaneous-issue discounts, or rate changes after 2025.</p>
-      <p>The spreadsheet also contains a simplified fallback formula for prices over $500K: <code class="bg-gray-100 px-1 rounded font-mono">((price - 500000) / 1000) × $4 + $2,904</code>. This formula produces slightly different results than the actual lookup table (which uses $4.56/1K for $501K–$1M and $3.42/1K for $1M–$2M). This calculator uses the more accurate tiered rates from the table, not the simplified formula.</p>
-      <p>For purchase prices above $2,000,000, the calculator extrapolates at the $3.42/1K rate. The source spreadsheet had no data above $2M, so this is an assumption.</p>
+      <p>The title insurance premium is calculated from a tiered piecewise formula based on a rate table specific to one title insurance underwriter's rate schedule. Your actual title insurance premium may differ based on your title company, any simultaneous-issue discounts, or rate changes after 2025.</p>
+      <p>A simplified fallback formula for prices over $500K exists: <code class="bg-gray-100 px-1 rounded font-mono">((price - 500000) / 1000) × $4 + $2,904</code>. This formula produces slightly different results than the actual tiered rate table (which uses $4.56/1K for $501K–$1M and $3.42/1K for $1M–$2M). This calculator uses the more accurate tiered rates, not the simplified formula.</p>
+      <p>For purchase prices above $2,000,000, the calculator extrapolates at the $3.42/1K rate. There is no rate data above $2M, so this is an assumption.</p>
     </div>
   </section>
 
@@ -44,8 +44,8 @@
       <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">PMI / Mortgage Insurance (Conventional Loans)</h2>
     </div>
     <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
-      <p>The source spreadsheet's PMI chart (Sheet2 columns D:E) maps LTV ranges to a uniform 0.94% annual rate for all LTV values from 80.01% to 97%. In reality, PMI rates vary significantly by LTV band, credit score, and insurer.</p>
-      <p>However, the spreadsheet's actual mortgage insurance formula doesn't use that chart at all — it uses a hardcoded value of <strong>0.52%</strong> (stored in cell L74). This calculator uses the 0.52% value to match the spreadsheet's behavior. Neither value is likely to match your actual PMI quote. Treat the mortgage insurance line as a rough placeholder and get a real quote from your lender.</p>
+      <p>The PMI chart maps LTV ranges to a uniform 0.94% annual rate for all LTV values from 80.01% to 97%. In reality, PMI rates vary significantly by LTV band, credit score, and insurer.</p>
+      <p>However, the actual mortgage insurance calculation uses a hardcoded value of <strong>0.52%</strong>. This calculator uses the 0.52% value. Neither value is likely to match your actual PMI quote. Treat the mortgage insurance line as a rough placeholder and get a real quote from your lender.</p>
     </div>
   </section>
 
@@ -78,7 +78,7 @@
     </div>
     <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
       <p><strong>Mandatory:</strong> estimated at 1.75% of the loan amount. Under FEMA's Risk Rating 2.0, actual flood insurance premiums are property-specific and can vary dramatically. This is a rough estimate only.</p>
-      <p><strong>Optional:</strong> flat $450. This is an arbitrary placeholder from the spreadsheet — actual optional flood policies vary widely.</p>
+      <p><strong>Optional:</strong> flat $450. This is an arbitrary placeholder — actual optional flood policies vary widely.</p>
     </div>
   </section>
 
@@ -95,7 +95,7 @@
         <li>Prorations use a 365-day year (actual days), not a 360-day banker's year</li>
         <li>Per-diem = annual tax ÷ 365, regardless of leap year</li>
       </ul>
-      <p>The spreadsheet's proration engine includes a days-in-year table that accounts for leap years (366 days for 2000, 2004, 2008, etc.) but uses 365 for most years including some that should be 366 (e.g., 2024 is listed as 365 but was actually 366). This calculator follows the spreadsheet's values for consistency, but the proration could be off by a small amount in leap years.</p>
+      <p>The days-in-year calculation accounts for leap years (366 days for 2000, 2004, 2008, etc.) but uses 365 for most years including some that should be 366 (e.g., 2024 is treated as 365 but was actually 366). The proration could be off by a small amount in leap years.</p>
       <p>The proration also assumes the seller has already paid the current period's full tax bill. If taxes are unpaid or partially paid, the actual settlement adjustment will differ.</p>
     </div>
   </section>
@@ -106,8 +106,8 @@
       <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Escrow Reserves</h2>
     </div>
     <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed space-y-3">
-      <p>The number of months collected into escrow at closing is determined by a lookup table specific to the lender's escrow analysis. Different lenders may require different reserve cushions. The values in this calculator come from one specific spreadsheet and may not match your lender's requirements.</p>
-      <p>RESPA limits the escrow cushion to 2 months, but the spreadsheet's escrow month counts sometimes exceed this (e.g., 13 months for school tax escrow in July closings). This likely reflects the initial escrow deposit needed to have funds available when the next tax bill is due, not an ongoing cushion violation.</p>
+      <p>The number of months collected into escrow at closing is determined by a lookup table specific to the lender's escrow analysis. Different lenders may require different reserve cushions, and the values in this calculator may not match your lender's requirements.</p>
+      <p>RESPA limits the escrow cushion to 2 months, but the escrow month counts used here sometimes exceed this (e.g., 13 months for school tax escrow in July closings). This likely reflects the initial escrow deposit needed to have funds available when the next tax bill is due, not an ongoing cushion violation.</p>
     </div>
   </section>
 
@@ -127,7 +127,7 @@
       <h2 class="font-semibold text-sm text-blue-700 uppercase tracking-wide">Flat Fees</h2>
     </div>
     <div class="px-5 py-4 text-sm text-gray-700">
-      <p class="mb-3 leading-relaxed">The following fees are hardcoded from the 2025 spreadsheet and may change over time or vary by provider:</p>
+      <p class="mb-3 leading-relaxed">The following fees are hardcoded as of 2025 and may change over time or vary by provider:</p>
       <div class="overflow-x-auto">
         <table class="w-full text-sm border-collapse">
           <thead>
@@ -222,7 +222,7 @@
     <div class="px-5 py-4 text-sm text-gray-700 leading-relaxed">
       <p class="mb-3">This calculator does not account for:</p>
       <ul class="list-disc list-inside space-y-1.5 ml-2">
-        <li>Lender-specific fees not in the spreadsheet (underwriting fees, warehouse fees, rate lock fees, etc.)</li>
+        <li>Lender-specific fees not listed here (underwriting fees, warehouse fees, rate lock fees, etc.)</li>
         <li>Survey costs</li>
         <li>Home warranty</li>
         <li>Prepaid HOA assessments or move-in fees</li>
